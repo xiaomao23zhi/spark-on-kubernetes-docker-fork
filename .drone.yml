@@ -1,0 +1,59 @@
+---
+kind: pipeline
+type: docker
+name: tatari-spark-infra-images
+
+environment:
+  LIVY_BUILDER_VERSION: "0.3"
+
+trigger:
+  event:
+    - push
+
+volumes:
+  - name: docker
+    host:
+      path: /var/run/docker.sock
+
+steps:
+  - name: pull-sbt-image
+    image: omerxx/drone-ecr-auth
+    volumes:
+      - name: docker
+        path: "/var/run/docker.sock"
+    env:
+      AWS_ACCESS_KEY_ID:
+        from_secret: AWS_ECR_ACCESS_KEY
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: AWS_ECR_SECRET_KEY
+    commands:
+      - $(aws ecr get-login --no-include-email --region us-west-2)
+      - docker pull 878256633362.dkr.ecr.us-west-2.amazonaws.com/sbt
+
+  - name: build-livy-builder-image
+    image: docker:19
+    volumes:
+      - name: docker
+        path: "/var/run/docker.sock"
+    commands:
+      - echo "building ./livy-builder/$LIVY_BUILDER_VERSION"
+      - docker build -t livy-builder:${DRONE_COMMIT_SHA} ./livy-builder/$LIVY_BUILDER_VERSION/
+
+  - name: publish-livy-builder-ecr
+    image: plugins/ecr:19.03
+    when:
+      branch:
+        - master
+        - main
+    settings:
+      context: ./livy-builder/${LIVY_BUILDER_VERSION}/
+      dockerfile: ./livy-builder/${LIVY_BUILDER_VERSION}/Dockerfile
+      repo: 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-builder
+      access_key:
+        from_secret: AWS_ECR_ACCESS_KEY
+      secret_key:
+        from_secret: AWS_ECR_SECRET_KEY
+      region: us-west-2
+      tags:
+        - latest
+        - ${DRONE_COMMIT_SHA}

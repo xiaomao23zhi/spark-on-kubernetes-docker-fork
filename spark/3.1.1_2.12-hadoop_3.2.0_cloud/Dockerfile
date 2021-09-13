@@ -1,9 +1,8 @@
 ### Builder Container
-FROM jeromebanks/livy-builder:0.3 as build
+FROM 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-builder as build
 
 ARG aws_bundle_version=1.11.1001
 RUN mvn dependency:copy -Dartifact=com.amazonaws:aws-java-sdk-bundle:${aws_bundle_version} -DoutputDirectory=/tmp
-
 
 RUN cd / && \
     git clone https://github.com/apache/spark.git --branch v3.1.1 --single-branch && \
@@ -69,8 +68,8 @@ RUN tar -xzf /spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}-scala-${SCALA_VERSION
     rm $SPARK_HOME/jars/aws-java-sdk-bundle*.jar && \
     cp /aws-java-sdk-bundle-*.jar $SPARK_HOME/jars
 
-# Add our DataDog metrics sink
-ADD jars/dd-spark-metrics-assembly-0.1.0.jar $SPARK_HOME/jars
+# joseph TODO
+# ADD jars/dd-spark-metrics-assembly-0.1.0.jar $SPARK_HOME/jars
 
 # install Conda (https://github.com/jupyter/docker-stacks/blob/6d42503c684f3de9b17ce92a6b0c952ef2d1ecd8/base-notebook/Dockerfile#L78-L101)
 RUN mkdir -p $CONDA_DIR && \
