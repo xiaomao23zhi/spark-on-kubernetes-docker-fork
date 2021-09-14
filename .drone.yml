@@ -4,7 +4,9 @@ type: docker
 name: tatari-spark-infra-images
 
 environment:
-  LIVY_BUILDER_VERSION: "0.3"
+  # YAML &anchors are defined here, used in plugin settings below
+  LIVY_BUILDER_VERSION: &LBV "./livy-builder/0.3"
+  LIVY_BUILDER_DOCKERFILE: &LBD "./livy-builder/0.3/Dockerfile"
 
 trigger:
   event:
@@ -36,8 +38,8 @@ steps:
       - name: docker
         path: "/var/run/docker.sock"
     commands:
-      - echo "building ./livy-builder/$LIVY_BUILDER_VERSION"
-      - docker build -t livy-builder:${DRONE_COMMIT_SHA} ./livy-builder/$LIVY_BUILDER_VERSION/
+      - echo "building $LIVY_BUILDER_VERSION"
+      - docker build -t livy-builder:${DRONE_COMMIT_SHA} $LIVY_BUILDER_VERSION
 
   - name: publish-livy-builder-ecr
     image: plugins/ecr:19.03
@@ -46,8 +48,8 @@ steps:
         - master
         - main
     settings:
-      context: ./livy-builder/${LIVY_BUILDER_VERSION}/
-      dockerfile: ./livy-builder/${LIVY_BUILDER_VERSION}/Dockerfile
+      context: *LBV
+      dockerfile: *LBD
       repo: 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-builder
       access_key:
         from_secret: AWS_ECR_ACCESS_KEY
