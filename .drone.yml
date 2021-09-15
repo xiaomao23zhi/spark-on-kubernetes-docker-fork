@@ -7,6 +7,9 @@ environment:
   # YAML &anchors are defined here, used in plugin settings below
   LIVY_BUILDER_VERSION: &LBV "./livy-builder/0.3"
   LIVY_BUILDER_DOCKERFILE: &LBD "./livy-builder/0.3/Dockerfile"
+  DD_SPARK_METRICS_VERSION: "dd-spark-metrics-assembly-0.1.0.jar"
+  SPARK_VERSION: &SV "spark/3.1.1_2.12-hadoop_3.2.0_cloud/"
+  SPARK_DOCKERFILE: &SD "spark/3.1.1_2.12-hadoop_3.2.0_cloud/Dockerfile"
 
 trigger:
   event:
@@ -47,10 +50,58 @@ steps:
       branch:
         - master
         - main
+    volumes:
+      - name: docker
+        path: "/var/run/docker.sock"
     settings:
       context: *LBV
       dockerfile: *LBD
       repo: 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-builder
+      access_key:
+        from_secret: AWS_ECR_ACCESS_KEY
+      secret_key:
+        from_secret: AWS_ECR_SECRET_KEY
+      region: us-west-2
+      tags:
+        - latest
+        - ${DRONE_COMMIT_SHA}
+
+  - name: pull-dd-spark-metrics-image
+    image: omerxx/drone-ecr-auth
+    volumes:
+      - name: docker
+        path: "/var/run/docker.sock"
+    env:
+      AWS_ACCESS_KEY_ID:
+        from_secret: AWS_ECR_ACCESS_KEY
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: AWS_ECR_SECRET_KEY
+    commands:
+      - $(aws ecr get-login --no-include-email --region us-west-2)
+      - docker pull 878256633362.dkr.ecr.us-west-2.amazonaws.com/joseph-test:dd-spark-metrics
+
+  - name: build-spark-image
+    image: docker:19
+    volumes:
+      - name: docker
+        path: "/var/run/docker.sock"
+    commands:
+      - echo "building $SPARK_VERSION"
+      - docker build -t spark:${DRONE_COMMIT_SHA} $SPARK_VERSION
+
+  - name: publish-spark-ecr
+    image: plugins/ecr:19.03
+    when:
+      branch:
+        - master
+        - main
+    volumes:
+      - name: docker
+        path: "/var/run/docker.sock"
+    settings:
+      context: *SV
+      dockerfile: *SD
+      repo: 878256633362.dkr.ecr.us-west-2.amazonaws.com/spark
       access_key:
         from_secret: AWS_ECR_ACCESS_KEY
       secret_key:
