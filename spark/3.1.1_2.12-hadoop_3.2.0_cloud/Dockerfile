@@ -16,7 +16,7 @@ RUN cd / && \
     cp spark-3.1.1-bin-hadoop-3.2.0-cloud-scala-2.12.tgz /
 
 # Pull dd-spark-metrics image to get the JAR inside in a later COPY --from=metrics
-FROM 878256633362.dkr.ecr.us-west-2.amazonaws.com/joseph-test:dd-spark-metrics as metrics
+FROM 878256633362.dkr.ecr.us-west-2.amazonaws.com/dd-spark-metrics as metrics
 
 ### Final Container
 ARG java_image_tag=11-jre-slim

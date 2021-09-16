@@ -7,9 +7,16 @@ environment:
   # YAML &anchors are defined here, used in plugin settings below
   LIVY_BUILDER_VERSION: &LBV "./livy-builder/0.3"
   LIVY_BUILDER_DOCKERFILE: &LBD "./livy-builder/0.3/Dockerfile"
+
   DD_SPARK_METRICS_VERSION: "dd-spark-metrics-assembly-0.1.0.jar"
   SPARK_VERSION: &SV "spark/3.1.1_2.12-hadoop_3.2.0_cloud/"
   SPARK_DOCKERFILE: &SD "spark/3.1.1_2.12-hadoop_3.2.0_cloud/Dockerfile"
+
+  LIVY_SPARK_VERSION: &LSV "livy-spark/0.8.0-incubating-spark_3.1.1_2.12-hadoop_3.2.0_cloud"
+  LIVY_SPARK_DOCKERFILE: &LSD "livy-spark/0.8.0-incubating-spark_3.1.1_2.12-hadoop_3.2.0_cloud/Dockerfile"
+
+  LIVY_VERSION: &LV "livy/0.8.0-incubating-spark_3.1.1_2.12-hadoop_3.2.0_cloud"
+  LIVY_DOCKERFILE: &LD "livy/0.8.0-incubating-spark_3.1.1_2.12-hadoop_3.2.0_cloud/Dockerfile"
 
 trigger:
   event:
@@ -34,15 +41,6 @@ steps:
     commands:
       - $(aws ecr get-login --no-include-email --region us-west-2)
       - docker pull 878256633362.dkr.ecr.us-west-2.amazonaws.com/sbt
-
-  - name: build-livy-builder-image
-    image: docker:19
-    volumes:
-      - name: docker
-        path: "/var/run/docker.sock"
-    commands:
-      - echo "building $LIVY_BUILDER_VERSION"
-      - docker build -t livy-builder:${DRONE_COMMIT_SHA} $LIVY_BUILDER_VERSION
 
   - name: publish-livy-builder-ecr
     image: plugins/ecr:19.03
@@ -78,16 +76,7 @@ steps:
         from_secret: AWS_ECR_SECRET_KEY
     commands:
       - $(aws ecr get-login --no-include-email --region us-west-2)
-      - docker pull 878256633362.dkr.ecr.us-west-2.amazonaws.com/joseph-test:dd-spark-metrics
-
-  - name: build-spark-image
-    image: docker:19
-    volumes:
-      - name: docker
-        path: "/var/run/docker.sock"
-    commands:
-      - echo "building $SPARK_VERSION"
-      - docker build -t spark:${DRONE_COMMIT_SHA} $SPARK_VERSION
+      - docker pull 878256633362.dkr.ecr.us-west-2.amazonaws.com/dd-spark-metrics
 
   - name: publish-spark-ecr
     image: plugins/ecr:19.03
@@ -110,3 +99,64 @@ steps:
       tags:
         - latest
         - ${DRONE_COMMIT_SHA}
+
+  - name: publish-livy-spark-ecr
+    image: plugins/ecr:19.03
+    when:
+      branch:
+        - master
+        - main
+    volumes:
+      - name: docker
+        path: "/var/run/docker.sock"
+    settings:
+      context: *LSV
+      dockerfile: *LSD
+      repo: 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-spark
+      access_key:
+        from_secret: AWS_ECR_ACCESS_KEY
+      secret_key:
+        from_secret: AWS_ECR_SECRET_KEY
+      region: us-west-2
+      tags:
+        - latest
+        - ${DRONE_COMMIT_SHA}
+
+  - name: publish-livy-ecr
+    image: plugins/ecr:19.03
+    when:
+      branch:
+        - master
+        - main
+    volumes:
+      - name: docker
+        path: "/var/run/docker.sock"
+    settings:
+      context: *LV
+      dockerfile: *LD
+      repo: 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy
+      access_key:
+        from_secret: AWS_ECR_ACCESS_KEY
+      secret_key:
+        from_secret: AWS_ECR_SECRET_KEY
+      region: us-west-2
+      tags:
+        - latest
+        - ${DRONE_COMMIT_SHA}
+
+  # Remove the docker images when not master
+  - name: delete-docker-image
+    image: docker:18
+    volumes:
+      - name: docker
+        path: "/var/run/docker.sock"
+    when:
+      branch:
+        exclude: [master, main]
+      status: [success, failure]
+    commands:
+      # Delete the images on a best-effort basis, by always returning 0.
+      - docker rmi 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-builder:${DRONE_COMMIT_SHA} 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-builder:latest || true
+      - docker rmi 878256633362.dkr.ecr.us-west-2.amazonaws.com/spark:${DRONE_COMMIT_SHA} 878256633362.dkr.ecr.us-west-2.amazonaws.com/spark:latest || true
+      - docker rmi 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-spark:${DRONE_COMMIT_SHA} 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-spark:latest || true
+      - docker rmi 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy:${DRONE_COMMIT_SHA} 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy:latest || true
