@@ -42,6 +42,27 @@ steps:
       - $(aws ecr get-login --no-include-email --region us-west-2)
       - docker pull 878256633362.dkr.ecr.us-west-2.amazonaws.com/sbt
 
+  - name: publish-livy-builder-ecr-staging
+    image: plugins/ecr:19.03
+    when:
+      branch:
+        - staging
+    volumes:
+      - name: docker
+        path: "/var/run/docker.sock"
+    settings:
+      context: *LBV
+      dockerfile: *LBD
+      repo: 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-builder
+      access_key:
+        from_secret: AWS_ECR_ACCESS_KEY
+      secret_key:
+        from_secret: AWS_ECR_SECRET_KEY
+      region: us-west-2
+      tags:
+        - staging
+        - ${DRONE_COMMIT_SHA}
+
   - name: publish-livy-builder-ecr
     image: plugins/ecr:19.03
     when:
@@ -64,8 +85,28 @@ steps:
         - latest
         - ${DRONE_COMMIT_SHA}
 
+  - name: pull-dd-spark-metrics-image-staging
+    image: omerxx/drone-ecr-auth
+    when:
+      branch:
+        - staging
+    volumes:
+      - name: docker
+        path: "/var/run/docker.sock"
+    env:
+      AWS_ACCESS_KEY_ID:
+        from_secret: AWS_ECR_ACCESS_KEY
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: AWS_ECR_SECRET_KEY
+    commands:
+      - $(aws ecr get-login --no-include-email --region us-west-2)
+      - docker pull 878256633362.dkr.ecr.us-west-2.amazonaws.com/dd-spark-metrics:staging
+
   - name: pull-dd-spark-metrics-image
     image: omerxx/drone-ecr-auth
+    when:
+      branch:
+        exclude: [staging]
     volumes:
       - name: docker
         path: "/var/run/docker.sock"
@@ -77,6 +118,30 @@ steps:
     commands:
       - $(aws ecr get-login --no-include-email --region us-west-2)
       - docker pull 878256633362.dkr.ecr.us-west-2.amazonaws.com/dd-spark-metrics
+
+  - name: publish-spark-ecr-staging
+    image: plugins/ecr:19.03
+    when:
+      branch:
+        - staging
+    volumes:
+      - name: docker
+        path: "/var/run/docker.sock"
+    settings:
+      context: *SV
+      dockerfile: *SD
+      repo: 878256633362.dkr.ecr.us-west-2.amazonaws.com/spark
+      access_key:
+        from_secret: AWS_ECR_ACCESS_KEY
+      secret_key:
+        from_secret: AWS_ECR_SECRET_KEY
+      region: us-west-2
+      build_args:
+        - LIVY_BUILDER_TAG=staging
+        - DD_TAG=staging
+      tags:
+        - staging
+        - ${DRONE_COMMIT_SHA}
 
   - name: publish-spark-ecr
     image: plugins/ecr:19.03
@@ -100,6 +165,30 @@ steps:
         - latest
         - ${DRONE_COMMIT_SHA}
 
+  - name: publish-livy-spark-ecr-staging
+    image: plugins/ecr:19.03
+    when:
+      branch:
+        - staging
+    volumes:
+      - name: docker
+        path: "/var/run/docker.sock"
+    settings:
+      context: *LSV
+      dockerfile: *LSD
+      repo: 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-spark
+      access_key:
+        from_secret: AWS_ECR_ACCESS_KEY
+      secret_key:
+        from_secret: AWS_ECR_SECRET_KEY
+      region: us-west-2
+      build_args:
+        - LIVY_BUILDER_TAG=staging
+        - SPARK_TAG=staging
+      tags:
+        - staging
+        - ${DRONE_COMMIT_SHA}
+
   - name: publish-livy-spark-ecr
     image: plugins/ecr:19.03
     when:
@@ -120,6 +209,29 @@ steps:
       region: us-west-2
       tags:
         - latest
+        - ${DRONE_COMMIT_SHA}
+
+  - name: publish-livy-ecr-staging
+    image: plugins/ecr:19.03
+    when:
+      branch:
+        - staging
+    volumes:
+      - name: docker
+        path: "/var/run/docker.sock"
+    settings:
+      context: *LV
+      dockerfile: *LD
+      repo: 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy
+      access_key:
+        from_secret: AWS_ECR_ACCESS_KEY
+      secret_key:
+        from_secret: AWS_ECR_SECRET_KEY
+      region: us-west-2
+      build_args:
+        - LIVY_SPARK_TAG=staging
+      tags:
+        - staging
         - ${DRONE_COMMIT_SHA}
 
   - name: publish-livy-ecr

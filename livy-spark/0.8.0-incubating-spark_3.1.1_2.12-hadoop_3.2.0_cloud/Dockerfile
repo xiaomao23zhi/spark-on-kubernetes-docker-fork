@@ -1,8 +1,8 @@
-ARG SPARK_BASE=878256633362.dkr.ecr.us-west-2.amazonaws.com/spark
-ARG LIVY_BUILDER=878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-builder
+ARG LIVY_BUILDER_TAG=latest
+ARG SPARK_TAG=latest
 
 ### Livy Builder Container
-FROM $LIVY_BUILDER as build
+FROM 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-builder:${LIVY_BUILDER_TAG} as build
 
 ARG LIVY_GITHUB_REPO=tatari-tv/incubator-livy
 ARG LIVY_GITHUB_BRANCH=master
@@ -18,13 +18,11 @@ RUN git clone https://github.com/${LIVY_GITHUB_REPO}.git --branch ${LIVY_GITHUB_
     cp assembly/target/apache-livy-0.8.0-incubating-SNAPSHOT-bin.zip /
 
 ### Final Container
-FROM $SPARK_BASE
+FROM 878256633362.dkr.ecr.us-west-2.amazonaws.com/spark:${SPARK_TAG}
 
 ARG LIVY_VERSION_ARG=0.8.0-incubating-SNAPSHOT
 
 LABEL maintainer="Jerome Banks <jerome@tatari.tv>"
-
-ENV BASE_IMAGE              $SPARK_BASE#$BASE_IMAGE
 
 ENV LIVY_VERSION            $LIVY_VERSION_ARG
 ENV LIVY_HOME               /opt/livy

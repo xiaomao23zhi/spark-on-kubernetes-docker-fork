@@ -1,5 +1,6 @@
 ### Builder Container
-FROM 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-builder as build
+ARG LIVY_BUILDER_TAG=latest
+FROM 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-builder:${LIVY_BUILDER_TAG} as build
 
 ARG aws_bundle_version=1.11.1001
 RUN mvn dependency:copy -Dartifact=com.amazonaws:aws-java-sdk-bundle:${aws_bundle_version} -DoutputDirectory=/tmp
@@ -16,7 +17,8 @@ RUN cd / && \
     cp spark-3.1.1-bin-hadoop-3.2.0-cloud-scala-2.12.tgz /
 
 # Pull dd-spark-metrics image to get the JAR inside in a later COPY --from=metrics
-FROM 878256633362.dkr.ecr.us-west-2.amazonaws.com/dd-spark-metrics as metrics
+ARG DD_TAG=latest
+FROM 878256633362.dkr.ecr.us-west-2.amazonaws.com/dd-spark-metrics:${DD_TAG} as metrics
 
 ### Final Container
 ARG java_image_tag=11-jre-slim

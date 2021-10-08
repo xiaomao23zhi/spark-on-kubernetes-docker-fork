@@ -1,6 +1,5 @@
-ARG LIVY_SPARK_BASE=878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-spark
-
-FROM $LIVY_SPARK_BASE
+ARG LIVY_SPARK_TAG=latest
+FROM 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-spark:${LIVY_SPARK_TAG}
 
 LABEL maintainer="Jerome Banks <jerome@tatari.tv>"
 
