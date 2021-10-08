@@ -1,5 +1,7 @@
-### Builder Container
 ARG LIVY_BUILDER_TAG=latest
+ARG DD_TAG=latest
+
+### Builder Container
 FROM 878256633362.dkr.ecr.us-west-2.amazonaws.com/livy-builder:${LIVY_BUILDER_TAG} as build
 
 ARG aws_bundle_version=1.11.1001
@@ -17,7 +19,6 @@ RUN cd / && \
     cp spark-3.1.1-bin-hadoop-3.2.0-cloud-scala-2.12.tgz /
 
 # Pull dd-spark-metrics image to get the JAR inside in a later COPY --from=metrics
-ARG DD_TAG=latest
 FROM 878256633362.dkr.ecr.us-west-2.amazonaws.com/dd-spark-metrics:${DD_TAG} as metrics
 
 ### Final Container
