@@ -4,7 +4,7 @@ ARG LIVY_BUILDER=jeromebanks/livy-builder:0.3
 ### Livy Builder Container
 FROM $LIVY_BUILDER as build
 
-ARG LIVY_GITHUB_REPO=tatari-tv/incubator-livy
+ARG LIVY_GITHUB_REPO=xiaomao23zhi/incubator-livy
 ###ARG LIVY_GITHUB_BRANCH=merge/first
 #ARG LIVY_GITHUB_BRANCH=master
 #ARG LIVY_GITHUB_BRANCH=topic/spark-3.1
