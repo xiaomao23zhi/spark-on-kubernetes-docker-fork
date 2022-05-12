@@ -8,7 +8,7 @@ ARG LIVY_GITHUB_REPO=xiaomao23zhi/incubator-livy
 ###ARG LIVY_GITHUB_BRANCH=merge/first
 #ARG LIVY_GITHUB_BRANCH=master
 #ARG LIVY_GITHUB_BRANCH=topic/spark-3.1
-ARG LIVY_GITHUB_BRANCH=LIVY-327
+ARG LIVY_GITHUB_BRANCH=LIVY-327-spark_3.2.1
 # ARG LIVY_GITHUB_BRANCH=v0.8.0/spark-3.0.0
 
 RUN git clone https://github.com/${LIVY_GITHUB_REPO}.git --branch ${LIVY_GITHUB_BRANCH} --single-branch --depth=50 && \
