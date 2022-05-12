@@ -14,7 +14,7 @@ ARG LIVY_GITHUB_BRANCH=LIVY-327-spark_3.2.1
 RUN git clone https://github.com/${LIVY_GITHUB_REPO}.git --branch ${LIVY_GITHUB_BRANCH} --single-branch --depth=50 && \
     cd incubator-livy && \
     mvn clean package -B -V -e \
-        -Pspark-3.1 \
+        -Pspark-3.2 \
         -Pthriftserver \
         -DskipTests \
         -DskipITs \
