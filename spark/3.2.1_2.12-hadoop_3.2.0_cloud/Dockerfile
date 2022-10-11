@@ -71,6 +71,7 @@ RUN tar -xzf /spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}-scala-${SCALA_VERSION
 
 # Add our DataDog metrics sink
 ADD jars/dd-spark-metrics-assembly-0.1.0.jar $SPARK_HOME/jars
+ADD jars/graphframes-0.8.2-spark3.2-s_2.12.jar $SPARK_HOME/jars
 
 # install Conda (https://github.com/jupyter/docker-stacks/blob/6d42503c684f3de9b17ce92a6b0c952ef2d1ecd8/base-notebook/Dockerfile#L78-L101)
 RUN mkdir -p $CONDA_DIR && \
