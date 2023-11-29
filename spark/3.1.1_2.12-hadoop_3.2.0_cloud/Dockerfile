@@ -1,5 +1,5 @@
 ### Builder Container
-FROM jeromebanks/livy-builder:0.3 as build
+FROM ghcr.io/xiaomao23zhi/builder:v0.1.0 as build
 
 ARG aws_bundle_version=1.11.1001
 RUN mvn dependency:copy -Dartifact=com.amazonaws:aws-java-sdk-bundle:${aws_bundle_version} -DoutputDirectory=/tmp
