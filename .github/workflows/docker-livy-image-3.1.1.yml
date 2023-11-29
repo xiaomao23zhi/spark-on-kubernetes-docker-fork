@@ -77,7 +77,7 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
         with:
-          context: ./builder
+          context: ./livy-builder/0.3
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -151,7 +151,7 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
         with:
-          context: ./livy-spark
+          context: ./spark/3.1.1_2.12-hadoop_3.2.0_cloud
           #build-args: SPARK_TAG=${{ steps.meta.outputs.tags }}
           build-args: |
             SPARK_VERSION=${{ env.SPARK_VERSION }}
@@ -228,7 +228,7 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
         with:
-          context: ./livy-spark
+          context: ./livy-spark/0.8.0-incubating-spark_3.1.1_2.12-hadoop_3.2.0_cloud
           #build-args: SPARK_TAG=${{ steps.meta.outputs.tags }}
           build-args: |
             SPARK_VERSION=${{ env.SPARK_VERSION }}
@@ -305,7 +305,7 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
         with:
-          context: ./livy
+          context: ./livy/0.8.0-incubating-spark_3.1.1_2.12-hadoop_3.2.0_cloud
           build-args: |
             LIVY_VERSION=${{ env.LIVY_VERSION }}
             SPARK_VERSION=${{ env.SPARK_VERSION }}
