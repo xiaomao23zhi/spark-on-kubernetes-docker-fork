@@ -18,8 +18,8 @@ env:
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   ORGANIZATION: xiaomao23zhi
-  SPARK_VERSION: 3.1.1
-  HADOOP_VERSION: hadoop3
+  SPARK_VERSION: 3.1.1_2.12
+  HADOOP_VERSION: hadoop_3.2.0_cloud_TT7
   LIVY_VERSION: 0.8.0
 
 jobs:
