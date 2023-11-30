@@ -49,4 +49,4 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run build.sh
-        run: ./spark/build.sh ${{ env.SPARK_VERSION }} ${{ env.HADOOP_VERSION }}
+        run: ./spark/3.1.1-hadoop-3/build.sh ${{ env.SPARK_VERSION }} ${{ env.HADOOP_VERSION }}
