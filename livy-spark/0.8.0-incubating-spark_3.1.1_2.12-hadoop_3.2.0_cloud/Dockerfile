@@ -1,4 +1,4 @@
-ARG SPARK_BASE=ghcr.io/xiaomao23zhi/spark:3.1.1_2.12-hadoop_3.2.0_cloud_TT6
+ARG SPARK_BASE=ghcr.io/xiaomao23zhi/spark-py:v3.1.1-hadoop3.2
 ARG LIVY_BUILDER=ghcr.io/xiaomao23zhi/builder:v0.1.0
 
 ### Livy Builder Container
