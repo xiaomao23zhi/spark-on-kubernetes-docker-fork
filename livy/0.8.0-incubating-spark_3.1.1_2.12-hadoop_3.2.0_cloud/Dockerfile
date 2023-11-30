@@ -1,4 +1,4 @@
-ARG SPARK_BASE=ghcr.io/xiaomao23zhi/livy-spark:0.8.0-incubating-spark_3.1.1_2.12-hadoop_3.2.0_cloud_TT7
+ARG SPARK_BASE=ghcr.io/xiaomao23zhi/livy-spark:v0.8.0_spark-3.1.1_2.12-hadoop_3.2.0_cloud_tt7
 
 FROM $SPARK_BASE
 
