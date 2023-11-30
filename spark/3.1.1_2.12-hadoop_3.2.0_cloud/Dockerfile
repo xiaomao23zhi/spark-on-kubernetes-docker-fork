@@ -76,7 +76,7 @@ ADD jars/dd-spark-metrics-assembly-0.1.0.jar $SPARK_HOME/jars
 RUN mkdir -p $CONDA_DIR && \
     cd /tmp && \
     ARCH=$(uname -m) && \
-    MINICONDA_INSTALL="Miniconda3-py38_${MINICONDA_VERSION}-Linux-${ARCH}.sh" \
+    MINICONDA_INSTALL="Miniconda3-py38_${MINICONDA_VERSION}-Linux-${ARCH}.sh" && \
     wget --quiet https://repo.continuum.io/miniconda/${MINICONDA_INSTALL} && \
     #echo "${MINICONDA_MD5} *Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh" | md5sum -c - && \
     /bin/bash ${MINICONDA_INSTALL} -f -b -p $CONDA_DIR && \
