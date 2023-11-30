@@ -75,10 +75,12 @@ ADD jars/dd-spark-metrics-assembly-0.1.0.jar $SPARK_HOME/jars
 # install Conda (https://github.com/jupyter/docker-stacks/blob/6d42503c684f3de9b17ce92a6b0c952ef2d1ecd8/base-notebook/Dockerfile#L78-L101)
 RUN mkdir -p $CONDA_DIR && \
     cd /tmp && \
-    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh && \
-    echo "${MINICONDA_MD5} *Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh" | md5sum -c - && \
-    /bin/bash Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
-    rm Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh && \
+    ARCH=$(uname -m) && \
+    MINICONDA_INSTALL="Miniconda3-py38_${MINICONDA_VERSION}-Linux-${ARCH}.sh" \
+    wget --quiet https://repo.continuum.io/miniconda/${MINICONDA_INSTALL} && \
+    #echo "${MINICONDA_MD5} *Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh" | md5sum -c - && \
+    /bin/bash ${MINICONDA_INSTALL} -f -b -p $CONDA_DIR && \
+    rm ${MINICONDA_INSTALL} && \
     echo "conda ${CONDA_VERSION}" >> $CONDA_DIR/conda-meta/pinned && \
     conda config --system --prepend channels conda-forge && \
     conda config --system --set auto_update_conda false && \
